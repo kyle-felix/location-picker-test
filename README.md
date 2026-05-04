@@ -34,17 +34,17 @@ npm run build       # Production bundle
 |------|------|
 | `src/components/LocationPicker.tsx` | Combobox UI, session tokens, commit flow |
 | `src/lib/places.ts` | Zod wire types, suggestion classification, `Place` + `placeToOrigin` / `placeToDestination` |
-| `src/lib/parsePrediction.ts` | Optional locality override when prediction text and resolved state/ZIP agree |
+| `src/lib/parsePrediction.ts` | Optional locality override for US-style and CA-style `City, ST` / postal predictions |
 | `vite.config.ts` | `POST /api/places/autocomplete`, `GET /api/places/details` → Google |
-| `src/App.tsx` | Pickup/drop demos (`PICKUP_*` / `DROP_*` constants document props) |
+| `src/App.tsx` | Pickup/drop demos (`DEMO_COUNTRIES`, `PICKUP_*`, `DROP_*`) |
 
 ## `LocationPicker` props (summary)
 
 - **`granularity`** — Allow-list: `address`, `named-place`, `city-state`, `city-state-postal`, `state`.
-- **`countries`** — ISO 3166-1 alpha-2 codes (Places caps how many you can send).
+- **`countries`** — ISO 3166-1 alpha-2 codes (Places caps how many you can send). Default **`["US", "CA"]`**. The **first** entry biases Google’s `regionCode` for autocomplete and Place Details—put your primary market first.
 - **`multi`** — `false`: `value`, `onChange`, `onSelect(place)`. `true`: `chips`, `onAdd`, `onRemove`.
 
-Pickup in the demo omits `state` in granularity and maps resolved `Place` to **`placeToOrigin`**. Drop uses **`placeToDestination`** per chip.
+Pickup in the demo omits `state` in granularity and maps resolved `Place` to **`placeToOrigin`**. Drop uses **`placeToDestination`** per chip. Resolved places are still restricted to **US or CA** in `placeFromDetails` (see `CountryCode` in `places.ts`).
 
 ## Porting
 

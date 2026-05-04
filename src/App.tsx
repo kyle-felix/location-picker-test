@@ -19,13 +19,16 @@ const ALL_GRANULARITY: Granularity[] = [
 ];
 const ALL_COUNTRIES = ["US", "CA"] as const;
 
+/** Supported markets for live pickup/drop columns (order biases Places `regionCode` to the first). */
+const DEMO_COUNTRIES: string[] = [...ALL_COUNTRIES];
+
 /** Pickup prototype — maps to `placeToOrigin` (no `state` granularity). */
 const PICKUP_GRANULARITY: Granularity[] = ["address", "city-state", "city-state-postal"];
-const PICKUP_COUNTRIES: string[] = ["US"];
+const PICKUP_COUNTRIES = DEMO_COUNTRIES;
 
 /** Drop prototype — maps to `placeToDestination` (multi + state allowed). */
 const DROP_GRANULARITY: Granularity[] = ["state", "city-state", "city-state-postal"];
-const DROP_COUNTRIES: string[] = ["US"];
+const DROP_COUNTRIES = DEMO_COUNTRIES;
 
 export function App() {
   const [theme, setTheme] = useState<"light" | "dark">(
@@ -58,7 +61,7 @@ export function App() {
   });
   const [pgCountries, setPgCountries] = useState<Record<string, boolean>>({
     US: true,
-    CA: false,
+    CA: true,
   });
   const [pgMulti, setPgMulti] = useState(true);
   const [pgValue, setPgValue] = useState("");
@@ -112,8 +115,9 @@ export function App() {
             <Code>multi=true</Code> with <Code>chips</Code>/<Code>onAdd</Code>/
             <Code>onRemove</Code>. Under each label, <Code>granularity</Code> and{" "}
             <Code>countries</Code> match the named constants in <Code>App.tsx</Code> (
-            <Code>PICKUP_*</Code> / <Code>DROP_*</Code>); the JSON echoes those props plus live
-            state.
+            <Code>PICKUP_*</Code> / <Code>DROP_*</Code>). Both use{" "}
+            <Code>DEMO_COUNTRIES</Code> (<Code>US</Code> + <Code>CA</Code>); the JSON echoes those
+            props plus live state.
           </p>
           <div className="grid gap-6 rounded-xl border border-border bg-card p-6 md:grid-cols-2">
             <Field
@@ -140,7 +144,7 @@ export function App() {
                 value={pickup}
                 onChange={setPickup}
                 onSelect={setPickupDetails}
-                placeholder="Search address, city, or ZIP"
+                placeholder="Search US/CA address, city, or postal code"
               />
               <StateBlock>
                 {JSON.stringify(
@@ -190,7 +194,7 @@ export function App() {
                 chips={drops}
                 onAdd={(p) => setDrops((cs) => [...cs, p])}
                 onRemove={(id) => setDrops((cs) => cs.filter((c) => c.id !== id))}
-                placeholder="Add state, city, or postal code…"
+                placeholder="Add US/CA state, city, or postal code…"
               />
               <StateBlock>
                 {JSON.stringify(
@@ -394,7 +398,7 @@ function DataSourceBanner() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/places/autocomplete?q=da&regions=us");
+        const res = await fetch("/api/places/autocomplete?q=da&regions=us,ca");
         if (cancelled) return;
         if (res.status === 503) {
           setStatus("missing-key");

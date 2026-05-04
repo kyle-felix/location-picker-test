@@ -64,7 +64,13 @@ export async function fetchAutocomplete(
 
 export async function fetchDetails(
   placeId: string,
-  opts: { sessionToken: string; predictionDescription?: string; signal?: AbortSignal },
+  opts: {
+    sessionToken: string;
+    predictionDescription?: string;
+    /** ISO country codes (e.g. us, ca) — biases Place Details `regionCode`. */
+    regions?: string[];
+    signal?: AbortSignal;
+  },
 ): Promise<PlaceDetails> {
   const params = new URLSearchParams({
     placeId,
@@ -72,6 +78,9 @@ export async function fetchDetails(
   });
   if (opts.predictionDescription) {
     params.set("predictionDescription", opts.predictionDescription);
+  }
+  if (opts.regions?.length) {
+    params.set("regions", opts.regions.map((c) => c.toLowerCase()).join(","));
   }
   const res = await fetch(`/api/places/details?${params.toString()}`, {
     signal: opts.signal,

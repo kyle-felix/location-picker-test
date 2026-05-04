@@ -181,13 +181,19 @@ async function handleDetails(
   const sessionToken = url.searchParams.get("sessionToken") ?? undefined;
   const predictionDescription =
     url.searchParams.get("predictionDescription") ?? undefined;
+  const regionsParam = url.searchParams.get("regions") ?? "us";
+  const detailRegionCodes = regionsParam
+    .split(",")
+    .map((s) => s.trim().toUpperCase())
+    .filter((s) => /^[A-Z]{2}$/.test(s));
+  const regionCode = detailRegionCodes[0] ?? "US";
 
   const fields = ["addressComponents", "location", "formattedAddress", "types"].join(",");
   const upstream = new URL(
     `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`,
   );
   upstream.searchParams.set("languageCode", "en");
-  upstream.searchParams.set("regionCode", "US");
+  upstream.searchParams.set("regionCode", regionCode);
   if (sessionToken) upstream.searchParams.set("sessionToken", sessionToken);
 
   try {

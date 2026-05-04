@@ -101,7 +101,7 @@ function formatRowLabel(s: PlaceSuggestion): string {
 
 export function LocationPicker({
   granularity = DEFAULT_GRANULARITY,
-  countries = ["US"],
+  countries = ["US", "CA"],
   multi = false,
   value = "",
   onChange,
@@ -207,6 +207,7 @@ export function LocationPicker({
         const details = await fetchDetails(suggestion.placeId, {
           sessionToken: sessionTokenRef.current,
           predictionDescription: suggestion.description,
+          regions: countries.map((c) => c.toLowerCase()),
         });
         sessionTokenRef.current = newSessionToken();
         const result = placeFromDetails(details, suggestion);
@@ -239,7 +240,7 @@ export function LocationPicker({
         setError(err instanceof Error ? err.message : "Failed to resolve place");
       }
     },
-    [multi, chips, onAdd, onChange, onSelect],
+    [multi, chips, countries, onAdd, onChange, onSelect],
   );
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
