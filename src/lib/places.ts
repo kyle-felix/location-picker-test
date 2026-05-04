@@ -341,8 +341,12 @@ export type AddressPlace = {
 
 export type Place = StatePlace | CityPlace | AddressPlace;
 
+/** Strip trailing country names from Google descriptions. `Mexico`/`MX` require a leading comma so "New Mexico" is not truncated. */
 export function stripCountrySuffix(s: string): string {
-  return s.replace(/,?\s*(USA|United States|Canada|CAN|Mexico|MX)\s*$/i, "").trim();
+  let t = s.trim();
+  t = t.replace(/,?\s*(USA|United States|Canada|CAN)\s*$/i, "").trim();
+  t = t.replace(/,\s*(Mexico|MX)\s*$/i, "").trim();
+  return t;
 }
 
 function parseCountry(value: string | null | undefined): CountryCode | null {
